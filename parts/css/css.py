@@ -1,7 +1,7 @@
 import logging
 log = logging.getLogger(__name__)
 
-from fapengine.fedj.parts import Part
+from djangoParts.parts import Part
 
 class Css(Part):
     TEMPLATE_PATH = "parts/css.html"
