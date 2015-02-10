@@ -39,6 +39,8 @@ INSTALLED_APPS = (
 
     "djangoParts.parts",
     "mainPage",
+    "colors",
+    "greenButton",
 )
 
 MIDDLEWARE_CLASSES = (

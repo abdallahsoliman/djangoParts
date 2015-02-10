@@ -7,10 +7,12 @@ class Page(Part):
     TEMPLATE_PATH = "parts/page.html"
     CONTENTS_PART = None
     NAME = ""
+    CHILD_LIST = []
 
     def __init__(self):
         Part.__init__(self)
         self.check()
+        self.CHILD_LIST.append(self.CONTENTS_PART)
 
     def check(self):
         Part.check(self)

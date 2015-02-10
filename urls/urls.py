@@ -17,5 +17,5 @@ class Urls:
         part_url = DjangoUrl(regex,Part.as_view(),name=part.name)
         self.url_list.append(part_url)
         for child in part.CHILD_LIST:
-            self.make(child_obj,part)
+            self.make(child)
         return self.url_list

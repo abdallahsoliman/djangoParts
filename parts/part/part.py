@@ -33,7 +33,8 @@ class Part(View):
         takes arguments from url
         returns response with rendered html
         """
-        response = HttpResponse(self.render(request,*args,**kwargs))
+        html = self.render(request,*args,**kwargs)
+        response = HttpResponse(html)
         return response
 
     def render(self,request,*args,**kwargs):
@@ -53,7 +54,18 @@ class Part(View):
                         "name":self.name,
                         "content":content,
                     }
-        return render_to_string("parts/part.html",part_context,context_inst)
+        html = render_to_string("parts/part.html",part_context,context_inst)
+
+        loader_context = {
+                            "name": self.name,
+                            "target": self.name,
+                            "target_url": self.url,
+                        }
+        context_inst = RequestContext(request,loader_context)
+        html += render_to_string("parts/loader.html",loader_context,context_inst)
+
+        return html
+
 
     def fetch(self,request,*args,**kwargs):
         """
