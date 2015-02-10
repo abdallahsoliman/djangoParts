@@ -9,8 +9,6 @@ class Page(Part):
     NAME = ""
 
     def __init__(self):
-        print "page constructor"
-        print self.NAME
         Part.__init__(self)
         self.check()
 
