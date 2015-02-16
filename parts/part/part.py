@@ -8,6 +8,7 @@ from django.conf.urls import url as DjangoUrl
 class Part(View):
     NAME = None
     TEMPLATE_PATH = None
+    PART_TEMPLATE_PATH = "parts/part.html"
     CHILD_LIST = []
     REQUIREMENTS_LIST = []
 
@@ -50,19 +51,20 @@ class Part(View):
         context_inst = RequestContext(request,context)
         content = render_to_string(self.TEMPLATE_PATH,context,context_inst)
 
-        part_context = {
-                        "name":self.name,
-                        "content":content,
-                    }
-        html = render_to_string("parts/part.html",part_context,context_inst)
-
         loader_context = {
                             "name": self.name,
                             "target": self.name,
                             "target_url": self.url,
                         }
         context_inst = RequestContext(request,loader_context)
-        html += render_to_string("parts/loader.html",loader_context,context_inst)
+        loader_html = render_to_string("parts/loader.html",loader_context,context_inst)
+
+        part_context = {
+                        "name": self.name,
+                        "content": content,
+                        "loader": loader_html
+                    }
+        html = render_to_string(self.PART_TEMPLATE_PATH,part_context,context_inst)
 
         return html
 

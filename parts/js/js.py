@@ -5,6 +5,7 @@ from djangoParts.parts import Part
 
 class Js(Part):
     TEMPLATE_PATH = "parts/js.html"
+    PART_TEMPLATE_PATH = "parts/requirement.html"
     SRC = None
 
     def fetch(self,*args,**kwargs):

@@ -5,6 +5,7 @@ from djangoParts.parts import Part
 
 class Css(Part):
     TEMPLATE_PATH = "parts/css.html"
+    PART_TEMPLATE_PATH = "parts/requirement.html"
     HREF = None
 
     def fetch(self,*args,**kwargs):

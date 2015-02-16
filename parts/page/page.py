@@ -5,6 +5,7 @@ from djangoParts.parts import Part
 
 class Page(Part):
     TEMPLATE_PATH = "parts/page.html"
+    PART_TEMPLATE_PATH = "parts/requirement.html"
     CONTENTS_PART = None
     NAME = ""
     CHILD_LIST = []
