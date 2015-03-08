@@ -1,6 +1,8 @@
 <div id="{{self.name}}">
 </div>
 <script>
+    //container js
+    //{{self.NAME}}
     {%for part in self.PART_LIST%}
         function load_{{part.NAME}}(){
             $("#{{self.name}}").load("/{{part.NAME}}")

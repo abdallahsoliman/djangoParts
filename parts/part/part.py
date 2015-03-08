@@ -7,13 +7,16 @@ from django.template.loader import render_to_string
 class Part(GenericView):
     NAME = None
     TEMPLATE_PATH = None
-    CONTAINER_LIST = None
+    PART_LIST = None
+    PARENT_PART = None
 
 
-    def __init__(self,container_name=None):
+    def __init__(self):
         GenericView.__init__(self)
         self.check()
-        self.container_name = container_name
+        if self.PART_LIST:
+            for child in self.PART_LIST:
+                child.PARTENT_PART = self
 
     def check(self):
         """
@@ -52,7 +55,7 @@ class Part(GenericView):
         #Render main html
         rendered_html = render_to_string(self.TEMPLATE_PATH,context,context_instance)
         #Render scripts to load any containers
-        rendered_html += render_to_string("parts/part_list_load_functions.html",
+        rendered_html += render_to_string("parts/part.html",
                                           {"self":self},
                                           context_instance)
         return rendered_html
