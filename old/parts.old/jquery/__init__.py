@@ -1,1 +1,0 @@
-from jquery import Jquery

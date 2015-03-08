@@ -1,7 +1,0 @@
-<script>
-    {%for js_function in js_function_list%}
-        function load{{js_function.name}}({%for input in js_function.inputs%}{{input}}{%if not forloop.last%},{%endif%}{%endfor%}){
-            ("#{{js_function.target}}").load("{{js_function.url}}?{%for input in js_function.inputs%}{{input}}="+{{input}}+"{%if not forloop.last%}&{%endif%}{%endfor%}")
-            }
-    {%endfor%}
-</script>
