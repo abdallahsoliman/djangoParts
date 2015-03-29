@@ -71,5 +71,5 @@ class Part(GenericView):
         return {}
 
 
-    def save(request,**kwargs):
+    def save(self,request,**kwargs):
         return

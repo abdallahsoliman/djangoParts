@@ -4,8 +4,8 @@
     //container js
     //{{self.NAME}}
     {%for part in self.PART_LIST%}
-        function load_{{part.NAME}}(){
-            $("#{{self.name}}").load("/{{part.NAME}}")
+        function load_{{part.NAME}}(args){
+            $("#{{self.name}}").load("/{{part.NAME}}?"+args)
             }
     {%endfor%}
     load_{{self.PART_LIST.0.NAME}}()

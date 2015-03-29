@@ -2,11 +2,14 @@
 <!-- {{self.NAME}} -->
 <script>
     {%for part in self.PART_LIST%}
-    $("#{{part.NAME}}").load("/{{part.NAME}}")
+    function load__{{part.NAME}}(args){
+        $("#{{part.NAME}}").load("/{{part.NAME}}?"+args)
+        }
+    load__{{part.NAME}}("")
     {%endfor%}
 
     {%if self.CLICK%}
-    $("#{{self.PARTENT_PART.NAME}}").click(
+    $("#{{self.NAME}}").click(
         function (){
             load_{{self.CLICK}}()
             }
@@ -15,7 +18,7 @@
 </script>
 <style>
     {%if self.CLICK%}
-    #{{self.PARTENT_PART.NAME}}{
+    #{{self.NAME}}{
         cursor: pointer;
         }
     {%endif%}
