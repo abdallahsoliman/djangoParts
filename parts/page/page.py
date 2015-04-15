@@ -1,43 +1,43 @@
-import logging
-log = logging.getLogger(__name__)
+from djangoParts.parts.basePart import BasePart
 
-from djangoParts.parts import Part
+from django.conf.urls import patterns, include, url
+from django.contrib import admin
 
-class Page(Part):
+
+class Page(BasePart):
+    NAME = "page"
     TEMPLATE_PATH = "parts/page.html"
-    CONTENTS_PART = None
-    NAME = ""
+    ADMIN = True
+    FAVICON_PATH = "parts/gear_icon.png"
 
-    def __init__(self):
-        Part.__init__(self)
-        self.check()
+    def fetch(self,request,**kwargs):
+        content = self.PART_LIST[0]().render(request)
+        context = {
+                    "content": content,
+                    "favicon_path": self.FAVICON_PATH,
+                }
+        return context
+    
+    def getUrls(self,PageDefinition):
+        pattern_list = [""]
 
-    def check(self):
-        Part.check(self)
-        if self.CONTENTS_PART == None:
-            raise Exception("your page has not been given any self.CONTENTS_PART")
+        #Append the admin url if option is set
+        if self.ADMIN == True:
+            pattern = url(r'^admin/', include(admin.site.urls))
+            pattern_list.append(pattern)
 
-    def fetch(self,request,*args,**kwargs):
-        requirements_list = self.REQUIREMENTS_LIST
-        #Get the requirements from all children
-        requirements_list += self.gatherRequirements(self.CONTENTS_PART)
+        #Get definition of self
+        pattern = url(r"^$",PageDefinition.as_view(),name=PageDefinition.NAME)
+        pattern_list.append(pattern)
 
-        css_html = ""
-        for css_class in requirements_list:
-            css_html += css_class().render(request)
-        js_html = ""
-        #for js_class in self.js_objects:
-        #    js_html += js_class.render(request)
+        pattern_list += self.makeUrl(PageDefinition)
+        return patterns(*pattern_list)
 
-        contents_html = self.CONTENTS_PART().render(request,*args,**kwargs)
-        return {
-                "page_css":css_html,
-                "page_js":js_html,
-                "page_contents":contents_html,
-            }
-
-    def gatherRequirements(self,Part):
-        requirements_list = Part.REQUIREMENTS_LIST
-        for ChildPart in Part.CHILD_LIST:
-            requirements_list += self.gatherRequirements(ChildPart)
-        return requirements_list
+    def makeUrl(self,part):
+        pattern_list = []
+        url_regex = r"^%s$" % part.NAME
+        pattern = url(url_regex,part.as_view(),name=part.NAME)
+        pattern_list.append(pattern)
+        for child_part in part.PART_LIST:
+            pattern_list += self.makeUrl(child_part)
+        return pattern_list
