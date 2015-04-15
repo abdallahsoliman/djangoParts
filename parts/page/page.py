@@ -11,12 +11,24 @@ class Page(BasePart):
     FAVICON_PATH = "parts/gear_icon.png"
 
     def fetch(self,request,**kwargs):
-        content = self.PART_LIST[0]().render(request)
+        if "page" in request.GET:
+            part_dict = self.getPartDict()
+            content_part = part_dict[request.GET["page"]]
+        else:
+            content_part = self.PART_LIST[0]
+
+        content = content_part().render(request)
         context = {
                     "content": content,
                     "favicon_path": self.FAVICON_PATH,
                 }
         return context
+
+    def getPartDict(self):
+        part_dict = {}
+        for part in self.PART_LIST:
+            part_dict[part.NAME] = part
+        return part_dict
     
     def getUrls(self,PageDefinition):
         pattern_list = [""]
