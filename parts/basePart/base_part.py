@@ -53,6 +53,8 @@ class BasePart(View):
 
         if type(context) != type({}):
             raise Exception("context must be a {} type")
+        #Add self to context
+        context["self"] = self
         context_instance = RequestContext(request,context)
 
         if self.TEMPLATE_PATH == None:
