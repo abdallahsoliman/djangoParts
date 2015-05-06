@@ -17,7 +17,7 @@ class Page(BasePart):
         else:
             content_part = self.PART_LIST[0]
 
-        content = content_part().render(request)
+        content = content_part().render(request,**kwargs)
         context = {
                     "content": content,
                     "favicon_path": self.FAVICON_PATH,
