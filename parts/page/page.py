@@ -7,22 +7,53 @@ from django.contrib import admin
 class Page(BasePart):
     NAME = "page"
     TEMPLATE_PATH = "parts/page.html"
-    ADMIN = True
+    DJANGO_ADMIN = True
     FAVICON_PATH = "parts/gear_icon.png"
 
     def fetch(self,request,**kwargs):
-        if "page" in request.GET:
-            part_dict = self.getPartDict()
-            content_part = part_dict[request.GET["page"]]
-        else:
-            content_part = self.PART_LIST[0]
-
-        content = content_part().render(request,**kwargs)
+        content = self.getContent(request,kwargs)
         context = {
                     "content": content,
                     "favicon_path": self.FAVICON_PATH,
                 }
         return context
+
+    def getContent(self,request,kwargs):
+        content_part = self.getContentPart(kwargs)
+        if content_part == False:
+            content = ""
+        else:
+            content = content_part().render(request,**kwargs)
+        return content
+
+    def getContentPart(self,kwargs):
+        if len(self.PART_LIST) == 0:
+            return False
+
+        if "test_part" in kwargs:
+            part_name = kwargs["test_part"]
+            test_part = self.getTestPart(self,part_name)
+            if not test_part:
+                raise Exception("could not find test part %s" % part_name)
+            return test_part
+
+        if "page" in kwargs:
+            part_dict = self.getPartDict()
+            return part_dict[kwargs["page"]]
+        else:
+            return self.PART_LIST[0]
+
+        raise Exception("could not find a part to render into page")
+
+
+    def getTestPart(self,part,part_name):
+        if part.NAME == part_name:
+            return part
+        for child_part in part.PART_LIST:
+            test_part = self.getTestPart(child_part,part_name)
+            if test_part:
+                return test_part
+        
 
     def getPartDict(self):
         part_dict = {}
@@ -34,7 +65,7 @@ class Page(BasePart):
         pattern_list = [""]
 
         #Append the admin url if option is set
-        if self.ADMIN == True:
+        if self.DJANGO_ADMIN == True:
             pattern = url(r'^admin/', include(admin.site.urls))
             pattern_list.append(pattern)
 
