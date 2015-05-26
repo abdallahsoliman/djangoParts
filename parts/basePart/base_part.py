@@ -77,13 +77,21 @@ class BasePart(View):
         if not handle:
             #Need to add container div
             context = {
-                        "id": self.NAME+"_container",
+                        "id": self.getName(kwargs)+"_container",
                         "content": html,
                     }
             context_instance = RequestContext(request,context)
             html = render_to_string(self.CONTAINER_TEMPLATE_PATH,context,context_instance)
         
         return html
+
+
+    def getName(self,kwargs):
+        if "name" in kwargs:
+            name = self.NAME+"_"+kwargs["name"]
+        else:
+            name = self.NAME
+        return name
 
 
     def getAuthRedirect(self,request):
