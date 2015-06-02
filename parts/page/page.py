@@ -2,6 +2,8 @@ from djangoParts.parts.basePart import BasePart
 
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 class Page(BasePart):
@@ -74,7 +76,12 @@ class Page(BasePart):
         pattern_list.append(pattern)
 
         pattern_list += self.makeUrl(PageDefinition)
-        return patterns(*pattern_list)
+        url_patterns = patterns(*pattern_list)
+        
+        #Add development media url
+        url_patterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+
+        return url_patterns
 
     def makeUrl(self,part):
         pattern_list = []
