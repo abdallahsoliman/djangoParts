@@ -79,7 +79,8 @@ class Page(BasePart):
         url_patterns = patterns(*pattern_list)
         
         #Add development media url
-        url_patterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+        if settings.MEDIA_URL and settings.MEDIA_ROOT:
+            url_patterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
 
         return url_patterns
 
