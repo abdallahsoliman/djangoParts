@@ -12,20 +12,20 @@ class Page(BasePart):
     DJANGO_ADMIN = True
     FAVICON_PATH = "parts/gear_icon.png"
 
-    def fetch(self,request,**kwargs):
-        content = self.getContent(request,kwargs)
+    def fetch(self,**kwargs):
+        content = self.getContent(kwargs)
         context = {
                     "content": content,
                     "favicon_path": self.FAVICON_PATH,
                 }
         return context
 
-    def getContent(self,request,kwargs):
+    def getContent(self,kwargs):
         content_part = self.getContentPart(kwargs)
         if content_part == False:
             content = ""
         else:
-            content = content_part().render(request,**kwargs)
+            content = content_part().render(**kwargs)
         return content
 
     def getContentPart(self,kwargs):
@@ -40,7 +40,7 @@ class Page(BasePart):
             return test_part
 
         if "page" in kwargs:
-            part_dict = self.getPartDict()
+            part_dict = self.makePartDict()
             return part_dict[kwargs["page"]]
         else:
             return self.PART_LIST[0]
@@ -55,15 +55,16 @@ class Page(BasePart):
             test_part = self.getTestPart(child_part,part_name)
             if test_part:
                 return test_part
-        
 
-    def getPartDict(self):
+
+    def makePartDict(self):
         part_dict = {}
         for part in self.PART_LIST:
             part_dict[part.NAME] = part
         return part_dict
-    
-    def getUrls(self,PageDefinition):
+        
+
+    def getUrls(self):
         pattern_list = [""]
 
         #Append the admin url if option is set
@@ -72,10 +73,10 @@ class Page(BasePart):
             pattern_list.append(pattern)
 
         #Get definition of self
-        pattern = url(r"^$",PageDefinition.as_view(),name=PageDefinition.NAME)
+        pattern = url(r"^$",type(self).as_view(),name=self.NAME)
         pattern_list.append(pattern)
 
-        pattern_list += self.makeUrl(PageDefinition)
+        pattern_list += self.makePatterns(self.PART_LIST)
         url_patterns = patterns(*pattern_list)
         
         #Add development media url
@@ -84,11 +85,11 @@ class Page(BasePart):
 
         return url_patterns
 
-    def makeUrl(self,part):
+    def makePatterns(self,part_list):
         pattern_list = []
-        url_regex = r"^%s$" % part.NAME
-        pattern = url(url_regex,part.as_view(),name=part.NAME)
-        pattern_list.append(pattern)
-        for child_part in part.PART_LIST:
-            pattern_list += self.makeUrl(child_part)
+        for part in part_list:
+            url_regex = r"^%s$" % part.NAME
+            pattern = url(url_regex,part.as_view(),name=part.NAME)
+            pattern_list.append(pattern)
+            pattern_list += self.makePatterns(part.PART_LIST)
         return pattern_list
