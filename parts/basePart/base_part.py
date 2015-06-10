@@ -2,7 +2,6 @@ from django.views.generic import View
 from django.http import HttpResponse
 from django.template import RequestContext
 from django.template.loader import render_to_string
-import json
 
 
 class BasePart(View):
@@ -11,10 +10,24 @@ class BasePart(View):
     PART_LIST = []
     CONTAINER_TEMPLATE_PATH = "parts/container.html"
     AUTH_REQUIRED = False
-    AUTH_REDIRECT_TEMPLATE_PATH = "parts/auth_redirect.html"
     REDIRECT_TEMPLATE_PATH = "parts/redirect.html"
 
 
+    #CONSTRUCTOR
+    def __init__(self,name=None,*args,**kwargs):
+        self.REDIRECT_TYPE = type(render_to_string(self.REDIRECT_TEMPLATE_PATH,{}))
+        View.__init__(self,*args,**kwargs)
+        self.name = self.getName(name)
+
+    def getName(self,name):
+        if name != None:
+            name = self.NAME+"_"+str(name)
+        else:
+            name = self.NAME
+        return name
+
+
+    #WEB METHODS
     def get(self,request,*args,**kwargs):
         return self.handle(request,*args,**kwargs)
 
@@ -26,18 +39,28 @@ class BasePart(View):
         A common function to handle both get and post requests
         """
         kwargs = self.makeArgs(request,kwargs)
-        html = self.render(request,handle=True,**kwargs)
+        html = self.render(handle=True,**kwargs)
         return HttpResponse(html)
 
     def makeArgs(self,request,kwargs):
+        if hasattr(request,"FILE"):
+            file_dict = request.FILE
+        else:
+            file_dict = {}
+        file_dict = self.mergeArgDict({},file_dict)
         post_dict = self.mergeArgDict({},request.POST)
+        #Merge file and post dicts
+        #Post dict overrides file
+        request_args = self.mergeArgDict(file_dict,post_dict,True)
         get_dict = self.mergeArgDict({},request.GET)
-        #Merge post and get dicts
-        #Get dict overrides post
-        request_args = self.mergeArgDict(post_dict,get_dict,True)
+        #Merge request_args and get dicts
+        #Get dict overrides request_args
+        request_args = self.mergeArgDict(request_args,get_dict,True)
         #Merge args from request into kwargs
         #Kwargs is not overridden
         kwargs = self.mergeArgDict(kwargs,request_args,False)
+        #Place request in kwargs
+        kwargs["request"] = request
         return kwargs
         
     def mergeArgDict(self,arg_dict,new_dict,override=False):
@@ -48,71 +71,79 @@ class BasePart(View):
         return arg_dict
 
 
-    def render(self,request,handle=False,**kwargs):
+    #RENDER FUNCTION
+    def render(self,handle=False,**kwargs):
         """
         Callable function that returns the page's html
         """
+
+        #Check name
+        if self.NAME == None:
+            raise Exception("must define self.NAME")
+
         #Check auth
         if self.AUTH_REQUIRED and \
-           not request.user.is_authenticated():
-            return self.getAuthRedirect(request)
+           not self.checkAuth():
+            return self.redirect(page="authentication")
+
+        #Check for delete
+        if "delete_"+self.NAME in kwargs:
+            delete_result = self.delete(**kwargs)
+            if type(delete_result) == self.REDIRECT_TYPE:
+                return delete_result
+
+        #Check for save
+        if "save_"+self.NAME in kwargs:
+            save_result = self.save(**kwargs)
+            if type(save_result) == self.REDIRECT_TYPE:
+                return save_result
 
         #Get context
-        context = self.fetch(request,**kwargs)
-        
+        context = self.fetch(**kwargs)
         #Check for redirect
-        if type(context) == type(render_to_string(self.REDIRECT_TEMPLATE_PATH,{})):
+        if type(context) == self.REDIRECT_TYPE:
             return context
 
         if type(context) != type({}):
             raise Exception("context must be a {} type")
         #Add self to context
         context["self"] = self
-        context_instance = RequestContext(request,context)
 
         if self.TEMPLATE_PATH == None:
             raise Exception("must define a self.TEMPLATE_PATH")
+        request = kwargs["request"]
+        context_instance = RequestContext(request,context)
         html = render_to_string(self.TEMPLATE_PATH,context,context_instance)
 
         if not handle:
+            """
+            If the render function was called by the handle method, then that
+            means that the part is being loaded individually. This means that
+            there is no need for a container div to be rendered.
+
+            If the render function was not called by the handle method, then
+            we also need to render the container div and associated js.
+            """
             #Need to add container div
             context = {
-                        "id": self.getName(kwargs)+"_container",
+                        "id": self.name+"_container",
                         "content": html,
                     }
             context_instance = RequestContext(request,context)
             html = render_to_string(self.CONTAINER_TEMPLATE_PATH,context,context_instance)
-        
+
         return html
 
+    def checkAuth(self,kwargs):
+        request = kwargs["request"]
+        return request.user.is_authenticated()
 
-    def getName(self,kwargs):
-        if "name" in kwargs:
-            name = self.NAME+"_"+kwargs["name"]
-        else:
-            name = self.NAME
-        return name
-
-
-    def getAuthRedirect(self,request):
-        next_json = ""
-        context = {
-                    "next_json": next_json,
-                }
-        context_instance = RequestContext(request,context)
-        redirect = render_to_string(self.AUTH_REDIRECT_TEMPLATE_PATH,
-                                    context,
-                                    context_instance)
-        return redirect
-
-
-    def redirect(self,request,args):
-        arg_list = ["%s=%s" % (key,args[key]) for key in args]
-        arg_string = "&".join(arg_list)
-        redirect_url = "/?"+arg_string
+    def redirect(self,kwargs):
+        redirect_url = self.makeUrl()
         context = {
                     "redirect_url": redirect_url,
                 }
+        request = kwargs["request"]
         context_instance = RequestContext(request,context)
         redirect = render_to_string(self.REDIRECT_TEMPLATE_PATH,
                                     context,
@@ -120,9 +151,24 @@ class BasePart(View):
         return redirect
 
 
-    def fetch(self,request,**kwargs):
+    #OVERRIDE METHODS
+    def fetch(self,**kwargs):
         """
         Gets data and creates context dict
         Override this function to make the context object
         """
         return {}
+
+    def save(self,**kwargs):
+        """
+        Automatically called when save_NAME is in args
+        Should save relevant information and return None
+        """
+        return
+
+    def delete(self,**kwargs):
+        """
+        Automatically called when delete_NAME is in args
+        Should delete all relevant objects and return None
+        """
+        return
