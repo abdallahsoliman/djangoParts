@@ -1,0 +1,7 @@
+<form id="{{self.name}}" method="POST" action="{{self.TARGET_URL}}" enctype="multipart/form-data">
+    {%csrf_token%}
+    {%for entry in entries%}
+        {{entry}}
+    {%endfor%}
+    {{submit_button}}
+</form>

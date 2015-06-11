@@ -6,7 +6,7 @@ class Stylesheet(BasePart):
     TEMPLATE_PATH = "parts/stylesheet.html"
     SOURCE = None
 
-    def fetch(self,request,**kwargs):
+    def fetch(self,**kwargs):
         if self.SOURCE == None:
             raise Exception("must define self.SOURCE")
 

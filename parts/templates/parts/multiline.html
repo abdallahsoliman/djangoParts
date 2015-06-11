@@ -1,0 +1,12 @@
+<div class="input-group">
+    {%if self.TITLE%}
+    <span class="input-group-addon">{{self.TITLE}}</span>
+    {%endif%}
+    <textarea id="{{self.name}}"
+              name="{{self.name}}"
+              rows="{{self.LINES}}"
+              class="form-control"
+              {%if value%}
+                  value="{{value}}"
+              {%endif%}/>
+</div>

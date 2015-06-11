@@ -1,0 +1,15 @@
+<div class="input-group">
+    {%if self.TITLE%}
+    <span class="input-group-addon">{{self.TITLE}}</span>
+    {%endif%}
+    <input id="{{self.name}}"
+     name="{{self.name}}"
+     type="text"
+     class="form-control"
+     {%if value%}
+        value="{{value}}"
+     {%endif%}
+     {%if self.PLACEHOLDER%}
+        placeholder="{{self.PLACEHOLDER}}"
+     {%endif%}/>
+</div>
