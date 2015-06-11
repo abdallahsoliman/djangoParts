@@ -25,7 +25,7 @@ class Page(BasePart):
         if content_part == False:
             content = ""
         else:
-            content = content_part().render(**kwargs)
+            content = content_part.render(**kwargs)
         return content
 
     def getContentPart(self,kwargs):
@@ -89,7 +89,7 @@ class Page(BasePart):
         pattern_list = []
         for part in part_list:
             url_regex = r"^%s$" % part.NAME
-            pattern = url(url_regex,part.as_view(),name=part.NAME)
+            pattern = url(url_regex,type(part).as_view(),name=part.NAME)
             pattern_list.append(pattern)
             pattern_list += self.makePatterns(part.PART_LIST)
         return pattern_list
