@@ -8,6 +8,7 @@ class BasePart(View):
     NAME = None
     TEMPLATE_PATH = None
     PART_LIST = []
+    RENDER_PART_LIST = False
     CONTAINER_TEMPLATE_PATH = "parts/container.html"
     AUTH_REQUIRED = False
     REDIRECT_TEMPLATE_PATH = "parts/redirect.html"
@@ -106,6 +107,9 @@ class BasePart(View):
 
         if type(context) != type({}):
             raise Exception("context must be a {} type")
+        part_dict = self.renderParts(kwargs)
+        for part_name in part_dict:
+            context[part_name] = part_dict[part_name]
         #Add self to context
         context["self"] = self
 
@@ -133,6 +137,19 @@ class BasePart(View):
             html = render_to_string(self.CONTAINER_TEMPLATE_PATH,context,context_instance)
 
         return html
+
+    def renderParts(self,kwargs):
+        """
+        Renders parts in self.PART_LIST
+        Returns dictionary where keys are part_name and values are html
+        """
+        if not self.RENDER_PART_LIST:
+            return {}
+
+        part_dict = {}
+        for part in self.PART_LIST: 
+            part_dict[part.name] = part.render(**kwargs)
+        return part_dict
 
     def checkAuth(self,kwargs):
         request = kwargs["request"]
