@@ -84,8 +84,8 @@ class BasePart(View):
 
         #Check auth
         if self.AUTH_REQUIRED and \
-           not self.checkAuth():
-            return self.redirect(page="authentication")
+           not self.checkAuth(**kwargs):
+            return self.redirect(args={page:"authentication"},**kwargs)
 
         #Check for delete
         if "delete_"+self.NAME in kwargs:
@@ -151,16 +151,19 @@ class BasePart(View):
             part_dict[part.name] = part.render(**kwargs)
         return part_dict
 
-    def checkAuth(self,kwargs):
-        request = kwargs["request"]
+    def checkAuth(self,request,**kwargs):
         return request.user.is_authenticated()
 
-    def redirect(self,kwargs):
-        redirect_url = self.makeUrl()
+    def redirect(self,request=None,args={},**kwargs):
+        if not request:
+            raise Exception("tried to redirect without a request object in kwargs")
+
+        arg_list = ["%s=%s" % (key,args[key]) for key in args]
+        arg_string = "&".join(arg_list)
+        redirect_url = "/?"+arg_string
         context = {
                     "redirect_url": redirect_url,
                 }
-        request = kwargs["request"]
         context_instance = RequestContext(request,context)
         redirect = render_to_string(self.REDIRECT_TEMPLATE_PATH,
                                     context,

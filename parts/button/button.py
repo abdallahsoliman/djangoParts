@@ -1,4 +1,4 @@
-from djangoParts.parts.base_part import BasePart as Part
+from djangoParts.parts.basePart import BasePart as Part
 
 
 class Button(Part):

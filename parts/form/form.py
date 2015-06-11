@@ -1,30 +1,44 @@
-from djangoParts.parts.base_part import BasePart as Part
+from djangoParts.parts.basePart import BasePart as Part
 from djangoParts.parts.button import Button
 
 
 class SubmitButton(Button):
     NAME = "submit_button"
     TITLE = "submit"
-    SUBMIT = True    
+    SUBMIT = True
+    CLASS = "btn btn-success"
 
 class Form(Part):
     NAME = "form"
     TEMPLATE_PATH = "parts/form.html"
     TARGET_URL = None
-    PART_LIST = [
-                    SubmitButton(name=self.NAME),
-                ]
-    REMDER_PART_LIST = True
+    ENTRY_LIST = None
+    SUBMIT_BUTTON = SubmitButton(name=NAME)
 
     def fetch(self,**kwargs):
+        if self.ENTRY_LIST == None:
+            raise Exception("must define self.ENTRY_LIST")
+        if self.TARGET_URL == None:
+            raise Exception("must define self.TARGET_URL")
+
         entry_list = []
-        for part in self.PART_LIST:
-            entry_html = part.render(kwargs)
+        for part in self.ENTRY_LIST:
+            entry_html = part.render(**kwargs)
             entry_list.append(entry_html)
         context = {
                     "entries": entry_list,
+                    "submit_button": self.SUBMIT_BUTTON.render(**kwargs)
                 }
         return context
+
+    def readValues(self,**kwargs):
+        value_dict = {}
+        for entry in self.ENTRY_LIST:
+            value = entry.readValue(**kwargs)
+            if value == None:
+                continue
+            value_dict[entry.name] = value
+        return value_dict
 
 
 class Entry(Part):
@@ -38,11 +52,17 @@ class Entry(Part):
                 }
         return context
 
-    def value(self,**kwargs):
+    def readValue(self,**kwargs):
+        """
+        Reads value from request
+        """
         return kwargs.get(self.name)
 
-    def getValue(self,**kwargs):
-        return None
+    def getValue(self,value=None,**kwargs):
+        """
+        Reads value from arguments
+        """
+        return value
 
 
 
