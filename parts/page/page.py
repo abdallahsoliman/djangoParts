@@ -11,12 +11,20 @@ class Page(BasePart):
     TEMPLATE_PATH = "parts/page.html"
     DJANGO_ADMIN = True
     FAVICON_PATH = "parts/gear_icon.png"
+    TRACKING_PATH = None
 
     def fetch(self,**kwargs):
         content = self.getContent(kwargs)
+
+        if self.TRACKING_PATH:
+            tracking_html = self.renderToString(self.TRACKING_PATH,{})
+        else:
+            tracking_html = False
+
         context = {
                     "content": content,
                     "favicon_path": self.FAVICON_PATH,
+                    "tracking": tracking_html,
                 }
         return context
 

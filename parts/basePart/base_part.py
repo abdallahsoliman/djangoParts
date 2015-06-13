@@ -126,8 +126,7 @@ class BasePart(View):
         if self.TEMPLATE_PATH == None:
             raise Exception("must define a self.TEMPLATE_PATH")
         request = kwargs["request"]
-        context_instance = RequestContext(request,context)
-        html = render_to_string(self.TEMPLATE_PATH,context,context_instance)
+        html = self.renderToString(self.TEMPLATE_PATH,context,request)
 
         if not handle:
             """
@@ -143,9 +142,16 @@ class BasePart(View):
                         "id": self.name+"__container",
                         "content": html,
                     }
-            context_instance = RequestContext(request,context)
-            html = render_to_string(self.CONTAINER_TEMPLATE_PATH,context,context_instance)
+            html = self.renderToString(self.CONTAINER_TEMPLATE_PATH,context,request)
 
+        return html
+
+    def renderToString(self,template_path,context,request=None):
+        if request:
+            context_instance = RequestContext(request,context)
+            html = render_to_string(template_path,context,context_instance)
+        else:
+            html = render_to_string(template_path,context)
         return html
 
     def renderParts(self,kwargs):
@@ -191,10 +197,7 @@ class BasePart(View):
         context = {
                     "redirect_url": redirect_url,
                 }
-        context_instance = RequestContext(request,context)
-        redirect = render_to_string(self.REDIRECT_TEMPLATE_PATH,
-                                    context,
-                                    context_instance)
+        redirect = self.renderToString(self.REDIRECT_TEMPLATE_PATH,context,request)
         return redirect
 
 
