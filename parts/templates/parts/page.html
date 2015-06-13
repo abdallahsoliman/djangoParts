@@ -11,5 +11,9 @@
     </head>
     <body>
         {{content|safe}}
+
+        {%if tracking%}
+            {{tracking|safe}}
+        {%endif%}
     </body>
 </html>
