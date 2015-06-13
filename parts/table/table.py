@@ -5,12 +5,12 @@ class Table(BasePart):
     TEMPLATE_PATH = "parts/table.html"
     HEADER = None
 
-    def fetch(self,request,rows=None,**kwargs):
-        if rows == None:
-            raise Exception("no data provided to template")
+    def fetch(self,body=None,**kwargs):
+        if body == None:
+            raise Exception("no data provided to table")
 
         context = {
                     "header": self.HEADER,
-                    "rows": rows,
+                    "body": body,
                 }
         return context

@@ -1,24 +1,24 @@
 <table class="table">
     {%if header%}
     <thead>
-        {%for row in header%}
+        {%for row in header.rows%}
         <tr>
-            {%for cell in row%}
+            {%for cell in row.cells%}
             <td>
-                {{cell}}
+                {{cell.value}}
             </td>
             {%endfor%}
         </tr>
         {%endfor%}
     </thead>
     {%endif%}
-    {%if rows%}
+    {%if body%}
     <tbody>
-        {%for row in rows%}
+        {%for row in body.rows%}
         <tr>
-            {%for cell in row%}
+            {%for cell in row.cells%}
             <td>
-                {{cell}}
+                {{cell.value}}
             </td>
             {%endfor%}
         </tr>

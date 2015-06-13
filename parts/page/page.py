@@ -25,7 +25,7 @@ class Page(BasePart):
         if content_part == False:
             content = ""
         else:
-            content = content_part.render(**kwargs)
+            content = content_part(prefix=self.name).render(**kwargs)
         return content
 
     def getContentPart(self,kwargs):
@@ -76,7 +76,7 @@ class Page(BasePart):
         pattern = url(r"^$",type(self).as_view(),name=self.NAME)
         pattern_list.append(pattern)
 
-        pattern_list += self.makePatterns(self.PART_LIST)
+        pattern_list += self.makePatterns(type(self))
         url_patterns = patterns(*pattern_list)
         
         #Add development media url
@@ -85,11 +85,10 @@ class Page(BasePart):
 
         return url_patterns
 
-    def makePatterns(self,part_list):
-        pattern_list = []
-        for part in part_list:
-            url_regex = r"^%s$" % part.NAME
-            pattern = url(url_regex,type(part).as_view(),name=part.NAME)
-            pattern_list.append(pattern)
-            pattern_list += self.makePatterns(part.PART_LIST)
+    def makePatterns(self,part):
+        url_regex = r"^%s$" % part.NAME
+        pattern = url(url_regex,part.as_view(),name=part.NAME)
+        pattern_list = [pattern]
+        for child_part in part.PART_LIST:
+            pattern_list += self.makePatterns(child_part)
         return pattern_list

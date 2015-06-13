@@ -12,20 +12,24 @@ class BasePart(View):
     CONTAINER_TEMPLATE_PATH = "parts/container.html"
     AUTH_REQUIRED = False
     REDIRECT_TEMPLATE_PATH = "parts/redirect.html"
+    CONTENT_VARIABLE = None
+    CONTENT_DEFAULT = None
 
 
     #CONSTRUCTOR
-    def __init__(self,name=None,*args,**kwargs):
+    def __init__(self,prefix=None,*args,**kwargs):
         self.REDIRECT_TYPE = type(render_to_string(self.REDIRECT_TEMPLATE_PATH,{}))
         View.__init__(self,*args,**kwargs)
-        self.name = self.getName(name)
+        self.prefix = prefix
+        self.setName(self.prefix)
 
-    def getName(self,name):
-        if name != None:
-            name = self.NAME+"_"+str(name)
+    def setName(self,prefix):
+        if prefix != None:
+            name = prefix +"__"+ self.NAME
         else:
             name = self.NAME
-        return name
+        self.name = name
+        self.container = name+"__container"
 
 
     #WEB METHODS
@@ -73,7 +77,7 @@ class BasePart(View):
 
 
     #RENDER FUNCTION
-    def render(self,handle=False,**kwargs):
+    def render(self,name=None,handle=False,**kwargs):
         """
         Callable function that returns the page's html
         """
@@ -82,10 +86,14 @@ class BasePart(View):
         if self.NAME == None:
             raise Exception("must define self.NAME")
 
+        if name != None:
+            self.name = name
+            self.container = self.name+"__container"
+
         #Check auth
         if self.AUTH_REQUIRED and \
-           not self.checkAuth():
-            return self.redirect(page="authentication")
+           not self.checkAuth(**kwargs):
+            return self.redirect(args={page:"authentication"},**kwargs)
 
         #Check for delete
         if "delete_"+self.NAME in kwargs:
@@ -110,6 +118,8 @@ class BasePart(View):
         part_dict = self.renderParts(kwargs)
         for part_name in part_dict:
             context[part_name] = part_dict[part_name]
+        if self.CONTENT_VARIABLE:
+            context["content"] = self.renderContent(kwargs)
         #Add self to context
         context["self"] = self
 
@@ -130,7 +140,7 @@ class BasePart(View):
             """
             #Need to add container div
             context = {
-                        "id": self.name+"_container",
+                        "id": self.name+"__container",
                         "content": html,
                     }
             context_instance = RequestContext(request,context)
@@ -147,20 +157,40 @@ class BasePart(View):
             return {}
 
         part_dict = {}
-        for part in self.PART_LIST: 
-            part_dict[part.name] = part.render(**kwargs)
+        for part in self.PART_LIST:
+            part_dict[part.NAME] = part(prefix=self.name).render(**kwargs)
         return part_dict
 
-    def checkAuth(self,kwargs):
-        request = kwargs["request"]
+    def renderContent(self,kwargs):
+        if not self.CONTENT_DEFAULT:
+            raise Exception("tried to render a content part without self.CONTENT_DEFAULT")
+
+        content_part = None
+        if self.CONTENT_VARIABLE in kwargs:
+            content_key = kwargs[self.CONTENT_VARIABLE]
+        else:
+            content_key = self.CONTENT_DEFAULT
+        for part in self.PART_LIST:
+            if part.NAME == content_key:
+                content_part = part
+                break
+        if not content_part:
+            raise Exception("could not find a content part with %s as self.NAME" % content_key)
+        return content_part(prefix=self.name).render(**kwargs)
+
+    def checkAuth(self,request,**kwargs):
         return request.user.is_authenticated()
 
-    def redirect(self,kwargs):
-        redirect_url = self.makeUrl()
+    def redirect(self,request=None,args={},**kwargs):
+        if not request:
+            raise Exception("tried to redirect without a request object in kwargs")
+
+        arg_list = ["%s=%s" % (key,args[key]) for key in args]
+        arg_string = "&".join(arg_list)
+        redirect_url = "/?"+arg_string
         context = {
                     "redirect_url": redirect_url,
                 }
-        request = kwargs["request"]
         context_instance = RequestContext(request,context)
         redirect = render_to_string(self.REDIRECT_TEMPLATE_PATH,
                                     context,
