@@ -2,7 +2,7 @@
     {%if self.TITLE%}
     <span class="input-group-addon">{{self.TITLE}}</span>
     {%endif%}
-    <select id="{{self.name}}" name="{{self.name}}" class="form-control">
+    <select id="{{self.}}" name="{{self.NAME}}" class="form-control">
         {%for option in options%}
             <option {%if option.selected%}
                         selected

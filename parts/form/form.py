@@ -10,10 +10,10 @@ class SubmitButton(Button):
 
 class Form(Part):
     NAME = "form"
-    TEMPLATE_PATH = "parts/form.html"
+    TEMPLATE_PATH = "parts/form/form.html"
     TARGET_URL = None
     ENTRY_LIST = None
-    SUBMIT_BUTTON = SubmitButton(name=NAME)
+    SUBMIT_BUTTON = SubmitButton(prefix=NAME)
 
     def fetch(self,**kwargs):
         if self.ENTRY_LIST == None:
@@ -23,7 +23,7 @@ class Form(Part):
 
         entry_list = []
         for part in self.ENTRY_LIST:
-            entry_html = part.render(**kwargs)
+            entry_html = part(self.name).render(**kwargs)
             entry_list.append(entry_html)
         context = {
                     "entries": entry_list,
@@ -34,10 +34,11 @@ class Form(Part):
     def readValues(self,**kwargs):
         value_dict = {}
         for entry in self.ENTRY_LIST:
+            entry = entry(self.name)
             value = entry.readValue(**kwargs)
             if value == None:
                 continue
-            value_dict[entry.name] = value
+            value_dict[entry.NAME] = value
         return value_dict
 
 
@@ -56,7 +57,7 @@ class Entry(Part):
         """
         Reads value from request
         """
-        return kwargs.get(self.name)
+        return kwargs.get(self.NAME)
 
     def getValue(self,value=None,**kwargs):
         """
@@ -67,7 +68,7 @@ class Entry(Part):
 
 
 class Input(Entry):
-    TEMPLATE_PATH = "parts/input.html"
+    TEMPLATE_PATH = "parts/form/input.html"
 
 
 class Money(Input):
@@ -75,7 +76,7 @@ class Money(Input):
 
 
 class Select(Entry):
-    TEMPLATE_PATH = "parts/select.html"
+    TEMPLATE_PATH = "parts/form/select.html"
     OPTION_LIST = None
     VALUE_ATTRIBUTE = None
     TITLE_ATTRIBUTE = None
@@ -107,16 +108,16 @@ class Select(Entry):
 
 
 class Password(Entry):
-    TEMPLATE_PATH = "parts/password.html"
+    TEMPLATE_PATH = "parts/form/password.html"
 
 
 class File(Entry):
-    TEMPLATE_PATH = "parts/file.html"
+    TEMPLATE_PATH = "parts/form/file.html"
     MULTIPLE = False
 
 
 class Multiline(Entry):
-    TEMPLATE_PATH = "parts/multiline.html"
+    TEMPLATE_PATH = "parts/form/multiline.html"
     LINES = None
     def fetch2(self,request,**kwargs):
         if self.LINES == None:
