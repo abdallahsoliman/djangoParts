@@ -25,7 +25,11 @@ class Form(Part):
         for part in self.ENTRY_LIST:
             entry_html = part(self.name).render(**kwargs)
             entry_list.append(entry_html)
+            
+        url = kwargs["request"].get_full_path() + self.TARGET_URL
+        
         context = {
+                    "url": url,
                     "entries": entry_list,
                     "submit_button": self.SUBMIT_BUTTON.render(**kwargs)
                 }
