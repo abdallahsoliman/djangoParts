@@ -82,7 +82,7 @@ class Select(Entry):
     TITLE_ATTRIBUTE = None
 
     def fetch(self,**kwargs):
-        selected_value = self.getValue(self,**kwargs)
+        selected_value = self.getValue(**kwargs)
         option_list = []
         for result in self.OPTION_LIST:
             value = getattr(result,self.VALUE_ATTRIBUTE)
