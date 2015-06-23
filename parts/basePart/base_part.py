@@ -77,7 +77,7 @@ class BasePart(View):
 
 
     #RENDER FUNCTION
-    def render(self,name=None,handle=False,**kwargs):
+    def render(self,part_name=None,handle=False,**kwargs):
         """
         Callable function that returns the page's html
         """
@@ -86,8 +86,8 @@ class BasePart(View):
         if self.NAME == None:
             raise Exception("must define self.NAME")
 
-        if name != None:
-            self.name = name
+        if part_name != None:
+            self.name = part_name
             self.container = self.name+"__container"
 
         #Check auth
