@@ -5,9 +5,5 @@
     <textarea id="{{self.name}}"
               name="{{self.NAME}}"
               rows="{{self.LINES}}"
-              class="form-control">
-              {%if value%}
-                  {{value}}
-              {%endif%}
-    </textarea>
+              class="form-control">{%if value%}{{value}}{%endif%}</textarea>
 </div>
