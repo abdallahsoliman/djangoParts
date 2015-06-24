@@ -120,6 +120,10 @@ class Password(Entry):
 class File(Entry):
     TEMPLATE_PATH = "parts/form/file.html"
     MULTIPLE = False
+    def readValue(self,**kwargs):
+        request = kwargs["request"]
+        f = request.FILE[self.NAME]
+        return f
 
 
 class Multiline(Entry):
