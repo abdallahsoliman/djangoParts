@@ -122,7 +122,7 @@ class File(Entry):
     MULTIPLE = False
     def readValue(self,**kwargs):
         request = kwargs["request"]
-        f = request.FILE[self.NAME]
+        f = request.FILES[self.NAME]
         return f
 
 
