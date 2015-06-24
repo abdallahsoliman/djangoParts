@@ -93,7 +93,7 @@ class BasePart(View):
         #Check auth
         if self.AUTH_REQUIRED and \
            not self.checkAuth(**kwargs):
-            return self.redirect(args={page:"authentication"},**kwargs)
+            return self.redirect(args={"page":"authentication"},**kwargs)
 
         #Check for delete
         if "delete_"+self.NAME in kwargs:
