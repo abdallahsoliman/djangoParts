@@ -122,6 +122,8 @@ class File(Entry):
     MULTIPLE = False
     def readValue(self,**kwargs):
         request = kwargs["request"]
+        if self.NAME not in request.FILES:
+            return
         f = request.FILES[self.NAME]
         return f
 
