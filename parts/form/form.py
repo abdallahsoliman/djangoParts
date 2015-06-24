@@ -81,14 +81,13 @@ class Money(Input):
 
 class Select(Entry):
     TEMPLATE_PATH = "parts/form/select.html"
-    OPTION_LIST = None
     VALUE_ATTRIBUTE = None
     TITLE_ATTRIBUTE = None
 
     def fetch(self,**kwargs):
         selected_value = self.getValue(**kwargs)
         option_list = []
-        for result in self.OPTION_LIST:
+        for result in self.getOptions(**kwargs):
             value = getattr(result,self.VALUE_ATTRIBUTE)
             title = getattr(result,self.TITLE_ATTRIBUTE)
 
@@ -109,6 +108,9 @@ class Select(Entry):
                     "options": option_list,
                 }
         return context
+        
+    def getOptions(self,**kwargs):
+        raise Exception("must implement self.getOptions(**kwargs)")
 
 
 class Password(Entry):
