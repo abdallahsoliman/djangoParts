@@ -184,7 +184,9 @@ class BasePart(View):
             raise Exception("could not find a content part with %s as self.NAME" % content_key)
         return content_part(prefix=self.name).render(**kwargs)
 
-    def checkAuth(self,request,**kwargs):
+    def checkAuth(self,request=None,**kwargs):
+        if not request:
+            raise Exception("no request provided")
         return request.user.is_authenticated()
 
     def redirect(self,request=None,args={},**kwargs):
