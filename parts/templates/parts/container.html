@@ -1,3 +1,8 @@
 <div id="{{id}}">
     {{content|safe}}
+<script>
+    function reload__{{self.name}}(args){
+        $("#{{id}}").load("/{{self.NAME}}?part_name={{self.name}}"+args)
+        }
+</script>
 </div>

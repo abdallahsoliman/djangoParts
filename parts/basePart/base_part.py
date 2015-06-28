@@ -25,7 +25,7 @@ class BasePart(View):
 
     def setName(self,prefix):
         if prefix != None:
-            name = prefix +"__"+ self.NAME
+            name = str(prefix) +"__"+ self.NAME
         else:
             name = self.NAME
         self.name = name
@@ -141,6 +141,7 @@ class BasePart(View):
             context = {
                         "id": self.name+"__container",
                         "content": html,
+                        "self": self,
                     }
             html = self.renderToString(self.CONTAINER_TEMPLATE_PATH,context,request)
 
