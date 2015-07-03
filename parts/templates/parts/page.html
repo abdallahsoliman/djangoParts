@@ -9,7 +9,7 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
         <link rel="icon" href="{{STATIC_URL}}{{favicon_path}}">
         {%for head in self.HEAD_LIST%}
-            {{head}}
+            {{head|safe}}
         {%endfor%}
     </head>
     <body>
