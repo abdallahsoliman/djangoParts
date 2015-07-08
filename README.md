@@ -27,7 +27,7 @@ The same is true in Django Parts. This app serves as the "top level" that will b
     <body>
         {{page_content}}
     </body>
-</html
+</html>
 ```
 
 To create the main page app:
@@ -51,7 +51,7 @@ That's it. You have just created the main page.
 ```
 from mainPage.views import MainPage
 
-urlpatters = MainPage().getUrls(MainPage)
+urlpatters = MainPage().getUrls()
 ```
 
 That's it. All urls will be generated at application runtime by the main page app
