@@ -1,5 +1,6 @@
+{% load parts %}
 {%if self.SUBMIT%}
 <button type="submit" class="{{self.CLASS}}">{{self.TITLE}}</button>
 {%else%}
-<a class="{{self.CLASS}}" href="{{self.TARGET_URL}}">{{self.TITLE}}</a>
+<a {% get_classes %}  href="{{self.TARGET_URL}}">{{self.TITLE}}</a>
 {%endif%}
