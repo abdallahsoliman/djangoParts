@@ -17,6 +17,6 @@ def jqId(context):
     return rendered_id
 
 @register.simple_tag(takes_context=True)
-def get_classes(context):
+def getClass(context):
     if context["self"].CLASS is not None:
         return "class='%s'" % context["self"].CLASS
