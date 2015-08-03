@@ -1,4 +1,5 @@
-<form id="{{self.name}}" method="POST" action="{{url|safe}}" enctype="multipart/form-data">
+{% load parts %}
+<form id="{{self.name}}" method="POST" action="{{url|safe}}" enctype="multipart/form-data" {% getClass %}>
     {%csrf_token%}
     {%for entry in entries%}
         {{entry}}

@@ -63,11 +63,11 @@ class Entry(Part):
         """
         return kwargs.get(self.NAME)
 
-    def getValue(self,value=None,**kwargs):
+    def getValue(self,**kwargs):
         """
         Reads value from arguments
         """
-        return value
+        return kwargs.get(self.NAME)
 
 
 
@@ -77,6 +77,10 @@ class Input(Entry):
 
 class Money(Input):
     pass
+
+
+class Hidden(Input):
+    TEMPLATE_PATH = "parts/form/hidden.html"
 
 
 class Select(Entry):

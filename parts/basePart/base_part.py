@@ -14,11 +14,12 @@ class BasePart(View):
     REDIRECT_TEMPLATE_PATH = "parts/redirect.html"
     CONTENT_VARIABLE = None
     CONTENT_DEFAULT = None
-
+    CLASS = None
 
     #CONSTRUCTOR
     def __init__(self,prefix=None,*args,**kwargs):
         self.REDIRECT_TYPE = type(render_to_string(self.REDIRECT_TEMPLATE_PATH,{}))
+        self.HTTP_RESPONSE_TYPE = type(HttpResponse())
         View.__init__(self,*args,**kwargs)
         self.prefix = prefix
         self.setName(self.prefix)
@@ -67,7 +68,7 @@ class BasePart(View):
         #Place request in kwargs
         kwargs["request"] = request
         return kwargs
-        
+
     def mergeArgDict(self,arg_dict,new_dict,override=False):
         for key in new_dict:
             if key in arg_dict and override == False:
@@ -112,9 +113,12 @@ class BasePart(View):
         #Check for redirect
         if type(context) == self.REDIRECT_TYPE:
             return context
+        #Check for HttpResponse
+        if type(context) == self.HTTP_RESPONSE_TYPE:
+            return context
 
         if type(context) != type({}):
-            raise Exception("context must be a {} type")
+            raise Exception("part, {0}, returned context that was not a dict type".format(self.NAME))
         part_dict = self.renderParts(kwargs)
         for part_name in part_dict:
             context[part_name] = part_dict[part_name]

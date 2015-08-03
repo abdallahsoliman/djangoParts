@@ -12,6 +12,7 @@ class Page(BasePart):
     DJANGO_ADMIN = True
     FAVICON_PATH = "parts/gear_icon.png"
     TRACKING_PATH = None
+    HEAD_LIST = []
 
     def fetch(self,**kwargs):
         content = self.getContent(kwargs)
@@ -21,10 +22,14 @@ class Page(BasePart):
         else:
             tracking_html = False
 
+        head_list = self.getHeadList(kwargs)
+        print head_list
+
         context = {
                     "content": content,
                     "favicon_path": self.FAVICON_PATH,
                     "tracking": tracking_html,
+                    "head_list": head_list,
                 }
         return context
 
@@ -100,3 +105,9 @@ class Page(BasePart):
         for child_part in part.PART_LIST:
             pattern_list += self.makePatterns(child_part)
         return pattern_list
+
+    def getHeadList(self,kwargs):
+        head_list = []
+        for head_part in self.HEAD_LIST:
+            head_list.append(head_part().render(**kwargs))
+        return head_list
