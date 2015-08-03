@@ -14,7 +14,7 @@ class BasePart(View):
     REDIRECT_TEMPLATE_PATH = "parts/redirect.html"
     CONTENT_VARIABLE = None
     CONTENT_DEFAULT = None
-
+    CLASS = None
 
     #CONSTRUCTOR
     def __init__(self,prefix=None,*args,**kwargs):
@@ -68,7 +68,7 @@ class BasePart(View):
         #Place request in kwargs
         kwargs["request"] = request
         return kwargs
-        
+
     def mergeArgDict(self,arg_dict,new_dict,override=False):
         for key in new_dict:
             if key in arg_dict and override == False:

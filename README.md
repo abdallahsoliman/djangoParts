@@ -25,7 +25,7 @@ The same is true in Django Parts. This app serves as the "top level" that will b
         etc...
     </head>
     <body>
-        {{page_content}}
+        {{content}}
     </body>
 </html>
 ```

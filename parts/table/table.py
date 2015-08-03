@@ -4,6 +4,7 @@ class Table(BasePart):
     NAME = "table"
     TEMPLATE_PATH = "parts/table.html"
     HEADER = None
+    CLASS = "table"
 
     def fetch(self,body=None,**kwargs):
         if body == None:
