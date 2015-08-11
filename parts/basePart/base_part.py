@@ -96,20 +96,30 @@ class BasePart(View):
            not self.checkAuth(**kwargs):
             return self.redirect(args={"page":"authentication"},**kwargs)
 
+        context = None
+
         #Check for delete
         if "delete_"+self.NAME in kwargs:
             delete_result = self.delete(**kwargs)
             if type(delete_result) == self.REDIRECT_TYPE:
                 return delete_result
+            if type(delete_result) == type({}) and\
+               context == None:
+                context = delete_result
 
         #Check for save
         if "save_"+self.NAME in kwargs:
             save_result = self.save(**kwargs)
             if type(save_result) == self.REDIRECT_TYPE:
                 return save_result
+            if type(save_result) == type({}) and\
+               context == None:
+                context = save_result
 
         #Get context
-        context = self.fetch(**kwargs)
+        fetch_result = self.fetch(**kwargs)
+        if context == None:
+            context = fetch_result
         #Check for redirect
         if type(context) == self.REDIRECT_TYPE:
             return context
