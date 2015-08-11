@@ -23,7 +23,6 @@ class Page(BasePart):
             tracking_html = False
 
         head_list = self.getHeadList(kwargs)
-        print head_list
 
         context = {
                     "content": content,
