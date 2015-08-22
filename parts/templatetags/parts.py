@@ -20,3 +20,9 @@ def jqId(context):
 def getClass(context):
     if context["self"].CLASS is not None:
         return "class='%s'" % context["self"].CLASS
+
+@register.simple_tag(takes_context=True)
+def makeUrl(context,new_url=""):
+    current_url = context["request"].get_full_path
+    print current_url
+    return current_url
