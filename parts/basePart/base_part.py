@@ -91,10 +91,13 @@ class BasePart(View):
             self.name = part_name
             self.container = self.name+"__container"
 
-        #Check auth
+        #Check authenticated
         if self.AUTH_REQUIRED and \
            not self.checkAuth(**kwargs):
             return self.redirect(args={"page":"authentication"},**kwargs)
+
+        #Check authorized
+        self.authorize(**kwargs)
 
         context = None
 
@@ -219,6 +222,12 @@ class BasePart(View):
 
 
     #OVERRIDE METHODS
+    def authorize(self,**kwargs):
+        """
+        Can be used to raise exceptions before any of the other methods are called
+        """
+        return
+
     def fetch(self,**kwargs):
         """
         Gets data and creates context dict
