@@ -139,10 +139,12 @@ class BasePart(View):
             context["content"] = self.renderContent(kwargs)
         #Add self to context
         context["self"] = self
+        #Add request to context
+        request = kwargs["request"]
+        context["request"] = request
 
         if self.TEMPLATE_PATH == None:
             raise Exception("must define a self.TEMPLATE_PATH")
-        request = kwargs["request"]
         html = self.renderToString(self.TEMPLATE_PATH,context,request)
 
         if not handle:
